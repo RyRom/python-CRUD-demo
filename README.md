@@ -6,3 +6,11 @@ Install flask
 ```
 pip3 install flask
 ```
+Open ```http://127.0.0.1:5000/```
+
+## Home Route
+Returns "Home"
+
+## Get by ID Route
+Open ```http://127.0.0.1:5000/get/3```
+Will return dummy data with ID as number provided
