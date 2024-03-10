@@ -7,7 +7,7 @@ Creating an API using the flask library
 ### More authorization: ```https://www.youtube.com/watch?v=W4GItcW7W-U&t=686s```
 
 ## To Run
-Run in command line
+Install modules:
 
 ```
 pip3 install flask flask_sqlalchemy flask_login flask_bcrypt flask_wtf wtforms email_validator
