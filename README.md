@@ -26,4 +26,7 @@ In website directory:
 - models contains db schema
 - views contains home code
 
-old has older, simpler code, not used in main project
+old has older, simpler code, not used in main project. Run with
+```
+python3 old.py
+```
