@@ -18,3 +18,12 @@ Then use to run:
 ```
 python3 app.py
 ```
+
+## Structure
+In website directory:
+- _init__ contains main initialization code
+- auth contains login page(s) code
+- models contains db schema
+- views contains home code
+
+old has older, simpler code, not used in main project
