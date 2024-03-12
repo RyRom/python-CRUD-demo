@@ -4,7 +4,7 @@ import pyodbc
 app = Flask(__name__)
 SERVER = 'localhost'
 DATABASE = 'dev_testdb1'
-USERNAME = 'SA'
+USERNAME = 'sa'
 PASSWORD = 'Str#ng_Passw#rd'
 
 
@@ -45,7 +45,7 @@ def get_by_id(id):
         
         cursor = connection.cursor()
         
-        select_query = f"SELECT * FROM Admin_BadStillImageURL WHERE ExpedictionID = ? "
+        select_query = f"SELECT * FROM Admin_BadStillImageURL WHERE ExpeditionID = ? "
         cursor.execute(select_query, id)
         
         connection.commit()
