@@ -48,12 +48,11 @@ def get_by_id(id):
         select_query = f"SELECT * FROM Admin_BadStillImageURL WHERE ExpeditionID = ? "
         cursor.execute(select_query, id)
         
-        connection.commit()
         data = cursor.fetchall()
         cursor.close()
         connection.close()
         
-        return jsonify({'data': data}), 200 
+        return data
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
