@@ -49,10 +49,11 @@ def get_by_id(id):
         cursor.execute(select_query, id)
         
         connection.commit()
+        data = cursor.fetchall()
         cursor.close()
         connection.close()
         
-        return jsonify({'message': 'Data retrieved successfully'}), 200 
+        return jsonify({'data': data}), 200 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
