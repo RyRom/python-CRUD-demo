@@ -3,12 +3,11 @@ import pyodbc
 
 app = Flask(__name__)
 SERVER = 'localhost'
-DATABASE = 'dev_testdb1'
+DATABASE = 'master'
 USERNAME = 'sa'
-PASSWORD = 'Str#ng_Passw#rd'
+PASSWORD = 'yourStrong(!)Password'
 
-
-connectionString = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD};'
+connectionString = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
 
 from flask import request
 
@@ -53,7 +52,7 @@ def get_by_id(id):
         connection.close()
         
         if row:
-            return row
+            return str(row)
         else:
             return jsonify({'error': 'No entry matching this id'})
     except Exception as e:
