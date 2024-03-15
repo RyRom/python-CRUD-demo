@@ -1,5 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template, request
+import pyrebase
 import pyodbc
+import urllib3
+from collections import MutableMapping
 
 app = Flask(__name__)
 SERVER = 'localhost'
@@ -9,11 +12,21 @@ PASSWORD = 'yourStrong(!)Password'
 
 connectionString = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
 
-from flask import request
+firebaseConfig = {
+    'apiKey': "AIzaSyA0vU74aS3FJ1y52aJ03e8XO2ltufAV3Hc",
+    'authDomain': "mbari-api-capstone.firebaseapp.com",
+    'projectId': "mbari-api-capstone",
+    'storageBucket': "mbari-api-capstone.appspot.com",
+    'messagingSenderId': "618968989931",
+    'appId': "1:618968989931:web:c6b33a2850e180bdf67eae"
+};
+
+fyrebase = pyrebase.initialize_app(firebaseConfig)
+auth = fyrebase.auth()
 
 @app.route('/')
 def home():
-    return "Home"
+    return 'Home'
 
 @app.route('/update/<int:expedition_id>/<int:expeditiondDataID_FK_id>', methods=['PUT'])
 def update_data(expedition_id, expeditiondDataID_FK_id):
