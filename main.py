@@ -1,8 +1,6 @@
 from flask import Flask, jsonify, render_template, request
-import pyrebase
 import pyodbc
-import urllib3
-from collections import MutableMapping
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 SERVER = 'localhost'
@@ -12,64 +10,109 @@ PASSWORD = 'yourStrong(!)Password'
 
 connectionString = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={SERVER};DATABASE={DATABASE};UID={USERNAME};PWD={PASSWORD}'
 
-firebaseConfig = {
-    'apiKey': "AIzaSyA0vU74aS3FJ1y52aJ03e8XO2ltufAV3Hc",
-    'authDomain': "mbari-api-capstone.firebaseapp.com",
-    'projectId': "mbari-api-capstone",
-    'storageBucket': "mbari-api-capstone.appspot.com",
-    'messagingSenderId': "618968989931",
-    'appId': "1:618968989931:web:c6b33a2850e180bdf67eae"
-};
+SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI (without trailing '/')
+API_URL = '/static/swagger.json'  # Our API url (can of course be a local resource)
 
-fyrebase = pyrebase.initialize_app(firebaseConfig)
-auth = fyrebase.auth()
+# Call factory function to create our blueprint
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,  # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
+    API_URL,
+    config={  # Swagger UI config overrides
+        'app_name': "Test application"
+    },
+    # oauth_config={  # OAuth config. See https://github.com/swagger-api/swagger-ui#oauth2-configuration .
+    #    'clientId': "your-client-id",
+    #    'clientSecret': "your-client-secret-if-required",
+    #    'realm': "your-realms",
+    #    'appName': "your-app-name",
+    #    'scopeSeparator': " ",
+    #    'additionalQueryStringParams': {'test': "hello"}
+    # }
+)
+
+app.register_blueprint(swaggerui_blueprint)
 
 @app.route('/')
 def home():
     return 'Home'
-
-@app.route('/update/<int:expedition_id>/<int:expeditiondDataID_FK_id>', methods=['PUT'])
-def update_data(expedition_id, expeditiondDataID_FK_id):
-    try:
-        
-        data = request.json
-        
-        connection = pyodbc.connect(connectionString)
-      
-        cursor = connection.cursor()
-        
-        update_query = f"UPDATE Admin_BadStillImageURL SET HtmlError = ?, URL = ? WHERE ExpeditionID = ? AND ExpeditiondDataID_FK = ?"
-        cursor.execute(update_query, (data['HtmlError'], data['URL'], expedition_id, expeditiondDataID_FK_id))
-        
-        connection.commit()
-        cursor.close()
-        connection.close()
-        
-        return jsonify({'message': 'Data updated successfully'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
     
-@app.route('/get/<int:id>', methods=['GET'])
-def get_by_id(id):
+@app.route('/getExpedition/<int:id>', methods=['GET'])
+def get_by_id_expedition(id):
     try:
         
         connection = pyodbc.connect(connectionString)
         
         cursor = connection.cursor()
         
-        select_query = f"SELECT * FROM Admin_BadStillImageURL WHERE ExpeditionID = ? "
+        select_query = f"SELECT * FROM Expedition WHERE ExpeditionID = ? "
         cursor.execute(select_query, id)
         
-        row = cursor.fetchone()
+        columns = [column[0] for column in cursor.description]
+        results = []
+        rows = cursor.fetchall()
         cursor.close()
         connection.close()
-        
-        if row:
-            return str(row)
+        if rows:
+            for row in rows:
+                results.append(dict(zip(columns, row)))   
+            return jsonify(results)
         else:
             return jsonify({'error': 'No entry matching this id'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/getDive/<int:id>', methods=['GET'])
+def get_by_id_dive(id):
+    try:
+        
+        connection = pyodbc.connect(connectionString)
+        
+        cursor = connection.cursor()
+        
+        select_query = f"SELECT * FROM Dive WHERE DiveID = ? "
+        cursor.execute(select_query, id)
+        
+        columns = [column[0] for column in cursor.description]
+        results = []
+        rows = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        if rows:
+            for row in rows:
+                results.append(dict(zip(columns, row)))   
+            return jsonify(results)
+        else:
+            return jsonify({'error': 'No entry matching this id'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
+@app.route('/get/<string:table>/<int:id>', methods=['GET'])
+def get_by_id(table,id):
+    try:
+        columnName = table + 'id'
+        
+        connection = pyodbc.connect(connectionString)
+        
+        cursor = connection.cursor()
+        
+        select_query = f'SELECT * FROM {table} WHERE {columnName} = ? '
+        cursor.execute(select_query, id)
+        
+        columns = [column[0] for column in cursor.description]
+        results = []
+        rows = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        if rows:
+            for row in rows:
+                results.append(dict(zip(columns, row)))   
+            return jsonify(results)
+        else:
+            return jsonify({'error': 'No entry matching this id'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
